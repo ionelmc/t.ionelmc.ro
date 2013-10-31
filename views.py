@@ -13,8 +13,8 @@ def track(env, start_response):
     except ValueError:
         return """
             <html><body><h1>Usage:</h1>
-            <code>%(host)s/UA-123456/domain.com?dp=<b>/path/to/page</b>&t=pageview&</code>
-
+            <code>%(host)s/UA-123456/domain.com?dp=<b>/path/to/page</b>&t=pageview<i>&args</i></code>
+            <blockquote><i>args</i>: any <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters">measurement protocol</a> parameters</blockquote>
             </body></html>
         """ % {'host': env.get('HTTP_HOST', '')}
 
