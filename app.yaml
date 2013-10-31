@@ -2,6 +2,7 @@ runtime: python27
 api_version: 1
 threadsafe: true
 application: ionelmc-tracking
+version: 1
 
 handlers:
 - url: /.*
