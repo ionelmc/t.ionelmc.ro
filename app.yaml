@@ -5,5 +5,5 @@ application: ionelmc-tracking
 version: 1
 
 handlers:
-- url: /.*
+- url: .*
   script: views.track
