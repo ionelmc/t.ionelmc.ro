@@ -1,0 +1,8 @@
+runtime: python27
+api_version: 1
+threadsafe: true
+application: ionelmc-tracking
+
+handlers:
+- url: /.*
+  script: views.track
