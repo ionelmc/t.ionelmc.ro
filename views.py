@@ -15,8 +15,7 @@ def track(env, start_response):
     tracker = Tracker(gaid, domain)
     tracker.config.queue_requests = True
     visitor = Visitor()
-    visitor.ip_address = env['REMOTE_ADDR']
-    visitor.user_agent = env.get('HTTP_USER_AGENT', None)
+    visitor.extract_from_server_meta(env)
     page = Page('/' + page)
     page.referrer = env.get("QUERY_STRING") or None
     request = PageViewRequest(
