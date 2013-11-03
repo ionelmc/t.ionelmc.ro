@@ -11,30 +11,68 @@ def track(env, start_response):
         if '/' in domain:
             raise ValueError
     except ValueError:
+        start_response('400', [])
         return """
-            <html><body><h1>Usage:</h1>
-            <code>%(host)s/UA-123456/domain.com?dp=<b>/path/to/page</b>&t=pageview<i>&args</i></code>
-            <blockquote><i>args</i>: any <a href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters">measurement protocol</a> parameters</blockquote>
-            </body></html>
+<html><body>
+    <h1>Usage:</h1>
+    <code>%(host)s/UA-123456/domain.com?dp=<b>/path/to/page</b>&t=pageview<i>&args</i></code>
+    <blockquote><dl>
+        <dt><strong>UA-123456</strong></dt>
+        <dd>This is the Tracking ID</dd>
+
+        <dt><strong>domain.com</strong></dt>
+        <dd>This is the domain that you see in your <a
+            href="https://support.google.com/analytics/answer/2790010?hl=en-GB">
+            Universal Analytics</a> javascript tracking code.</dd>
+
+        <dt><strong>t</strong></dt>
+        <dd>Type of event.</dd>
+
+        <dt><strong>dp</strong></dt>
+        <dd>Page url that should show as viewed. You want this to be the page
+            path that the feed item points to. In other words, the URL without
+            the protocol and domain. <strong>Don't forget to quote it !</strong>
+            </dd>
+
+        <dt><strong>dr</strong></dt>
+        <dd>You can specify a different referral URL here. If you don't specify
+            this then the <code>Referer</code> header is used. Set
+            <code>dr</code> to empty value if you don't want this. <strong>Don't
+            forget to quote it !</strong> </dd>
+
+        <dt><strong>referer</strong></dt>
+        <dd>Specify this to override the value from the <code>Referer</code>
+            header is used. Has no effect if <strong><code>dr</code></strong> is
+            set. <strong>Don't forget to quote it !</strong> </dd>
+
+        <dt><strong><em>args</em></strong></dt>
+        <dd>Any <a
+            href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters">
+            measurement protocol</a> parameters.</dd>
+
+    </blockquote>
+</body></html>
         """ % {'host': env.get('HTTP_HOST', '')}
 
     cookies = SimpleCookie()
     if 'HTTP_COOKIE' in env:
         cookies.load(env['HTTP_COOKIE'])
 
-    cookies['cid'] = cid = 'cid' in cookies and cookies['cid'].value or str(uuid4())
+    cid = 'cid' in cookies and cookies['cid'].value or str(uuid4())
+    cookies['cid'] = cid
     cookies['cid']['path'] = '/%s/%s' % (gaid, domain)
-    cookies['cid']['max-age'] = 31536000
-
+    cookies['cid']['max-age'] = 62899200
+    parameters = url_decode(env["QUERY_STRING"]).items()
+    referer = parameters.pop('referer', None)
     data = dict(
         v=1,
         tid=gaid,
         cid=cid,
         dh=domain,
-        dr=env.get("HTTP_REFERER", ''),
+        dr=env.get("HTTP_REFERER", '') if referer is None else referer,
         z=str(time()),
     )
-    data.update(url_decode(env["QUERY_STRING"]).items())
+    data.update(parameters)
 
 
     location = "//www.google-analytics.com/collect?" + urlencode(data)
