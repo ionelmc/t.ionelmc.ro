@@ -51,3 +51,7 @@ def track(env, start_response):
         ('Location', location)
     ])
     return ""
+
+def warmup(env, start_response):
+    start_response('200', [])
+    return ""

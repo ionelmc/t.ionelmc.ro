@@ -3,7 +3,15 @@ api_version: 1
 threadsafe: true
 application: ionelmc-tracking
 version: 1
+inbound_services:
+- warmup
 
 handlers:
+- url: /(robots.txt|favicon.ico)
+  static_files: static/\1
+  upload: static/(.*)
+- url: /_ah/warmup
+  script: views.warmup
 - url: .*
   script: views.track
+
