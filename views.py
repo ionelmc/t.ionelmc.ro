@@ -46,6 +46,10 @@ def track(env, start_response):
             header is used. Has no effect if <strong><code>dr</code></strong> is
             set. <strong>Don't forget to quote it !</strong> </dd>
 
+        <dt><strong>protocol</strong></dt>
+        <dd>Specify this to set a specific protocol in the redirect. Acceptable
+        values: http, https </dd>
+
         <dt><strong><em>args</em></strong></dt>
         <dd>Any <a
             href="https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters">
@@ -65,6 +69,8 @@ def track(env, start_response):
     cookies['cid']['max-age'] = 62899200
     parameters = url_decode(env["QUERY_STRING"])
     referer = parameters.pop('referer', None)
+    protocol = parameters.pop('protocol', None)
+    assert protocol in (None, 'http', 'https')
     data = dict(
         v=1,
         tid=gaid,
@@ -76,7 +82,9 @@ def track(env, start_response):
     data.update(parameters.items())
 
     logging.info("Redirect data: %r", data)
-    location = "//www.google-analytics.com/collect?" + urlencode(data)
+
+    location = protocol + ":" if protocol else ""
+    location += "//www.google-analytics.com/collect?" + urlencode(data)
     #start_response('200', [
     #    ('Set-Cookie', cookies['cid'].OutputString()),
     #])
@@ -87,7 +95,7 @@ def track(env, start_response):
 
     start_response('307 Temporary Redirect', [
         ('Set-Cookie', cookies['cid'].OutputString()),
-        ('Location', location)
+        ('Location', location.encode('utf8'))
     ])
     return ""
 
