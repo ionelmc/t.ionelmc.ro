@@ -1,3 +1,4 @@
+import logging
 from time import time
 from uuid import uuid4
 from urllib import urlencode
@@ -74,7 +75,7 @@ def track(env, start_response):
     )
     data.update(parameters.items())
 
-
+    logging.info("Redirect data: %r", data)
     location = "//www.google-analytics.com/collect?" + urlencode(data)
     #start_response('200', [
     #    ('Set-Cookie', cookies['cid'].OutputString()),
