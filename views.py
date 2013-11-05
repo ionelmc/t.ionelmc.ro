@@ -62,7 +62,7 @@ def track(env, start_response):
     cookies['cid'] = cid
     cookies['cid']['path'] = '/%s/%s' % (gaid, domain)
     cookies['cid']['max-age'] = 62899200
-    parameters = url_decode(env["QUERY_STRING"]).items()
+    parameters = url_decode(env["QUERY_STRING"])
     referer = parameters.pop('referer', None)
     data = dict(
         v=1,
@@ -72,7 +72,7 @@ def track(env, start_response):
         dr=env.get("HTTP_REFERER", '') if referer is None else referer,
         z=str(time()),
     )
-    data.update(parameters)
+    data.update(parameters.items())
 
 
     location = "//www.google-analytics.com/collect?" + urlencode(data)
